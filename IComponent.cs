@@ -1,3 +1,5 @@
+using Microsoft.Xna.Framework;
+
 namespace SGame
 {
     public interface IComponent
@@ -7,6 +9,7 @@ namespace SGame
 
     public interface INewComponent
     {
-        
+        ProcessType Type { get; }
+        void Process(GameTime gameTime);
     }
 }

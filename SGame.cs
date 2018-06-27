@@ -12,6 +12,7 @@ namespace SGame
 
         private Entity player;
         private DrawComponentFactory drawComponentFactory;
+        private IComponentsPool componentsPool;
 
         public SGame()
         {
@@ -23,6 +24,8 @@ namespace SGame
         {
             base.Initialize();
 
+            componentsPool = new ComponentsPool();
+            componentsPool.Register(new NewPlayerInputComponent());
             player = new Entity().WithComponent(new PlayerInputComponent()).WithComponent(new PlayerDrawComponent(GraphicsDevice));
         }
 
