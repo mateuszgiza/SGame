@@ -6,8 +6,8 @@ namespace SGame
 {
     public class SystemManager
     {
-        private Dictionary<Entity, IList<INewComponent>> entityComponents = new Dictionary<Entity, IList<INewComponent>>();
-        private Dictionary<INewComponent, IList<Entity>> componentEntities = new Dictionary<INewComponent, IList<Entity>>();
+        private Dictionary<Entity, IList<IComponent>> entityComponents = new Dictionary<Entity, IList<IComponent>>();
+        private Dictionary<IComponent, IList<Entity>> componentEntities = new Dictionary<IComponent, IList<Entity>>();
         private IComponentsPool componentsPool;
 
         public SystemManager(IComponentsPool componentsPool)
@@ -15,13 +15,13 @@ namespace SGame
             this.componentsPool = componentsPool;
         }
 
-        public void Attach<T>(Entity entity) where T : INewComponent
+        public void Attach<T>(Entity entity) where T : IComponent
         {
             var component = componentsPool.GetComponent<T>();
 
             if (!entityComponents.TryGetValue(entity, out var components))
             {
-                components = new List<INewComponent>();
+                components = new List<IComponent>();
                 entityComponents.TryAdd(entity, components);
             }
 
@@ -49,15 +49,7 @@ namespace SGame
 
         private void Process(GameTime gameTime, ProcessType type)
         {
-            var components = componentsPool.GetComponentsByProcessType(type);
-            foreach (var component in components)
-            {
-                var entities = componentEntities[component];
-                foreach (var entity in entities)
-                {
-                    component.Process
-                }
-            }
+            
         }
     }
 }

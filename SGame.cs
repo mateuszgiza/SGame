@@ -13,6 +13,7 @@ namespace SGame
         private Entity player;
         private DrawComponentFactory drawComponentFactory;
         private IComponentsPool componentsPool;
+        private EntityComponentSystem EntityComponentSystem;
 
         public SGame()
         {
@@ -23,6 +24,8 @@ namespace SGame
         protected override void Initialize()
         {
             base.Initialize();
+
+            EntityComponentSystem = new EntityComponentSystem(this, GraphicsDevice);
 
             componentsPool = new ComponentsPool();
             componentsPool.Register(new NewPlayerInputComponent());
@@ -41,7 +44,7 @@ namespace SGame
                 Exit();
             }
 
-            player.Components.OfType<IUpdateable>().ForEach(x => x.Update(gameTime));
+            //player.Components.OfType<IUpdateable>().ForEach(x => x.Update(gameTime));
             
             base.Update(gameTime);
         }
@@ -50,7 +53,7 @@ namespace SGame
         {
             graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            player.Components.OfType<IDrawable>().ForEach(x => x.Draw(gameTime));
+            //player.Components.OfType<IDrawable>().ForEach(x => x.Draw(gameTime));
 
             base.Draw(gameTime);
         }

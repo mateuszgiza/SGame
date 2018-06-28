@@ -7,7 +7,13 @@ namespace SGame
     {
         public Vector2 Position { get; set; }
         public Vector2 Size { get; set; }
+        public EntityComponentCollection Components { get; }
+        public EntityTagCollection Tags { get; }
 
-        public IList<IComponent> Components { get; } = new List<IComponent>();
+        public Entity()
+        {
+            Components = new EntityComponentCollection(this);
+            Tags = new EntityTagCollection();
+        }
     }
 }

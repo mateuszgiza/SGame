@@ -6,10 +6,4 @@ namespace SGame
     {
         Entity Entity { get; set; }
     }
-
-    public interface INewComponent
-    {
-        ProcessType Type { get; }
-        void Process(GameTime gameTime);
-    }
 }

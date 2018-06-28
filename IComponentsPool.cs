@@ -4,8 +4,7 @@ namespace SGame
 {
     public interface IComponentsPool
     {
-        T Register<T>(T component) where T : INewComponent;
-        T GetComponent<T>() where T : INewComponent;
-        IEnumerable<INewComponent> GetComponentsByProcessType(ProcessType type);
+        T Register<T>(T component) where T : IComponent;
+        T GetComponent<T>() where T : IComponent;
     }
 }
