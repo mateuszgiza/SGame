@@ -8,33 +8,48 @@ namespace SGame
     public class SGame : Game
     {
         private GraphicsDeviceManager graphics;
-        private SpriteBatch spriteBatch;
-
-        private Entity player;
-        private DrawComponentFactory drawComponentFactory;
-        private IComponentsPool componentsPool;
-        private EntityComponentSystem EntityComponentSystem;
+        private SystemContext Context;
+        private FpsCounter FpsCounter;
 
         public SGame()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            //IsFixedTimeStep = false; // unlock 60fps
+            //graphics.SynchronizeWithVerticalRetrace = false; // disable vsync
         }
 
         protected override void Initialize()
         {
             base.Initialize();
 
-            EntityComponentSystem = new EntityComponentSystem(this, GraphicsDevice);
+            FpsCounter = new FpsCounter();
 
-            componentsPool = new ComponentsPool();
-            componentsPool.Register(new NewPlayerInputComponent());
-            player = new Entity().WithComponent(new PlayerInputComponent()).WithComponent(new PlayerDrawComponent(GraphicsDevice));
+            Context = new SystemContext();
+            Context.Game = this;
+            Context.GraphicsDevice = GraphicsDevice;
+            Context.SystemManager = new SystemManager();
+            Context.EntityComponentSystem = new EntityComponentSystem();
+            Context.ProcessingSystemManager = new ProcessingSystemManager();
+            Context.DrawLayerSystem = new DrawLayerSystem();
+
+            Context.ProcessingSystemManager
+                    .Register(new PlayerInputProcessingSystem())
+                    .Register(new PlayerDrawProcessingSystem());
+
+            Context.EntityComponentSystem.Entities.Add(new Entity()
+                    .WithTag(Tags.Player)
+                    .WithSize(new Vector2(50, 50))
+                    .WithPosition(new Vector2(100, 100))
+                    .WithComponent(new PlayerInputComponent()));
+
+            Context.DrawLayerSystem
+                    .AddLayer(Layers.FpsCounter)
+                    .AddLayer(Layers.Player);
         }
 
         protected override void LoadContent()
         {
-            spriteBatch = new SpriteBatch(GraphicsDevice);
         }
 
         protected override void Update(GameTime gameTime)
@@ -44,8 +59,8 @@ namespace SGame
                 Exit();
             }
 
-            //player.Components.OfType<IUpdateable>().ForEach(x => x.Update(gameTime));
-            
+            Context.SystemManager.ProcessUpdate(gameTime);
+
             base.Update(gameTime);
         }
 
@@ -53,7 +68,10 @@ namespace SGame
         {
             graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            //player.Components.OfType<IDrawable>().ForEach(x => x.Draw(gameTime));
+            FpsCounter.Update(gameTime);
+            System.Console.WriteLine($"FPS: {FpsCounter.FramesCount}");
+
+            Context.SystemManager.ProcessDraw(gameTime);
 
             base.Draw(gameTime);
         }

@@ -1,55 +1,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace SGame
 {
-    public class SystemManager
+    public class SystemManager : IHaveContext
     {
-        private Dictionary<Entity, IList<IComponent>> entityComponents = new Dictionary<Entity, IList<IComponent>>();
-        private Dictionary<IComponent, IList<Entity>> componentEntities = new Dictionary<IComponent, IList<Entity>>();
-        private IComponentsPool componentsPool;
-
-        public SystemManager(IComponentsPool componentsPool)
-        {
-            this.componentsPool = componentsPool;
-        }
-
-        public void Attach<T>(Entity entity) where T : IComponent
-        {
-            var component = componentsPool.GetComponent<T>();
-
-            if (!entityComponents.TryGetValue(entity, out var components))
-            {
-                components = new List<IComponent>();
-                entityComponents.TryAdd(entity, components);
-            }
-
-            if (!componentEntities.TryGetValue(component, out var entities))
-            {
-                entities = new List<Entity>();
-                componentEntities.TryAdd(component, entities);
-            }
-
-            if (!components.OfType<T>().Any())
-            {
-                components.Add(component);
-            }
-
-            if (!entities.Contains(entity))
-            {
-                entities.Add(entity);
-            }
-        }
+        public ISystemContext Context { get; set; }
 
         public void ProcessUpdate(GameTime gameTime)
         {
-
+            Context.ProcessingSystemManager.ProcessSystems(gameTime, ProcessType.Update);
         }
 
-        private void Process(GameTime gameTime, ProcessType type)
+        public void ProcessDraw(GameTime gameTime)
         {
-            
+            var layer = Context.DrawLayerSystem.GetLayer(Layers.Player);
+
+            layer.Begin();
+            Context.ProcessingSystemManager.ProcessSystems(gameTime, ProcessType.Draw);
+            layer.End();
         }
     }
 }

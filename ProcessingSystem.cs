@@ -9,7 +9,5 @@ namespace SGame
         public abstract ProcessType Type {get;}
 
         public abstract void Process(GameTime gameTime);
-
-
     }
 }
