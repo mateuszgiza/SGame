@@ -11,11 +11,12 @@ namespace SGame
         public override void Process(GameTime gameTime)
         {
             var player = EntityComponentSystem.Entities.GetByTag(Tags.Player).FirstOrDefault();
+            var transform = player.Components.Get<TransformComponent>();
             var layer = EntityComponentSystem.Context.DrawLayerSystem.GetLayer(Layers.Player);
 
-            var playerOrigin = player.Position + player.Size / 2;
+            var playerOrigin = transform.Position + transform.Size / 2;
 
-            layer.DrawCircle(playerOrigin, player.Size.X / 2, 32, Color.Red);
+            layer.DrawCircle(playerOrigin, transform.Size.X / 2, 32, Color.Red);
         }
     }
 }

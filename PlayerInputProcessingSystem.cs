@@ -12,23 +12,21 @@ namespace SGame
         {
             var keyState = Keyboard.GetState();
             var player = EntityComponentSystem.Entities.GetByTag(Tags.Player).FirstOrDefault();
+            var transform = player.Components.Get<TransformComponent>();
+            var inputComponent = player.Components.Get<PlayerInputComponent>();
 
-            (var x, var y) = player.Position;
+            var direction = Vector2.Zero;
 
-            if (keyState.IsKeyDown(Keys.A)) {
-                x -= 5;
-            }
-            if (keyState.IsKeyDown(Keys.D)) {
-                x += 5;
-            }
-            if (keyState.IsKeyDown(Keys.W)) {
-                y -= 5;
-            }
-            if (keyState.IsKeyDown(Keys.S)) {
-                y += 5;
-            }
+            if (keyState.IsKeyDown(inputComponent.MoveLeft))
+                direction -= Vector2.UnitX;
+            if (keyState.IsKeyDown(inputComponent.MoveRight))
+                direction += Vector2.UnitX;
+            if (keyState.IsKeyDown(inputComponent.MoveUp))
+                direction -= Vector2.UnitY;
+            if (keyState.IsKeyDown(inputComponent.MoveDown))
+                direction += Vector2.UnitY;
 
-            player.Position = new Vector2(x, y);
+            transform.Position += direction * inputComponent.Speed;
         }
     }
 }

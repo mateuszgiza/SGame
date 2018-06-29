@@ -39,6 +39,7 @@ namespace SGame
 
             Context.EntityComponentSystem.Entities.Add(new Entity()
                     .WithTag(Tags.Player)
+                    .WithComponent(new TransformComponent())
                     .WithSize(new Vector2(50, 50))
                     .WithPosition(new Vector2(100, 100))
                     .WithComponent(new PlayerInputComponent()));

@@ -12,13 +12,13 @@ namespace SGame
 
         public static Entity WithPosition(this Entity entity, Vector2 position)
         {
-            entity.Position = position;
+            entity.Components.Get<TransformComponent>().Position = position;
             return entity;
         }
 
         public static Entity WithSize(this Entity entity, Vector2 size)
         {
-            entity.Size = size;
+            entity.Components.Get<TransformComponent>().Size = size;
             return entity;
         }
 
