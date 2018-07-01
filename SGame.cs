@@ -10,6 +10,7 @@ namespace SGame
         private GraphicsDeviceManager graphics;
         private SystemContext Context;
         private FpsCounter FpsCounter;
+        private Texture2D ball;
 
         public SGame()
         {
@@ -42,7 +43,9 @@ namespace SGame
                     .WithComponent(new TransformComponent())
                     .WithSize(new Vector2(50, 50))
                     .WithPosition(new Vector2(100, 100))
-                    .WithComponent(new PlayerInputComponent()));
+                    .WithComponent(new PlayerInputComponent())
+                    .WithComponent(new DrawComponent())
+                    .WithTexture(ball));
 
             Context.DrawLayerSystem
                     .AddLayer(Layers.FpsCounter)
@@ -51,6 +54,7 @@ namespace SGame
 
         protected override void LoadContent()
         {
+            ball = Content.Load<Texture2D>("ball");
         }
 
         protected override void Update(GameTime gameTime)

@@ -1,5 +1,6 @@
 using System.Linq;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using MonoGame.Extended;
 
 namespace SGame
@@ -10,13 +11,19 @@ namespace SGame
 
         public override void Process(GameTime gameTime)
         {
+            EntityComponentSystem.Context.DrawLayerSystem.DrawOnLayer(Layers.Player, DrawPlayerBody);
+        }
+
+        private void DrawPlayerBody(SpriteBatch spriteBatch)
+        {
             var player = EntityComponentSystem.Entities.GetByTag(Tags.Player).FirstOrDefault();
             var transform = player.Components.Get<TransformComponent>();
-            var layer = EntityComponentSystem.Context.DrawLayerSystem.GetLayer(Layers.Player);
+            var drawComponent = player.Components.Get<DrawComponent>();
 
             var playerOrigin = transform.Position + transform.Size / 2;
+            var destination = new Rectangle(transform.Position.ToPoint(), transform.Size.ToPoint());
 
-            layer.DrawCircle(playerOrigin, transform.Size.X / 2, 32, Color.Red);
+            spriteBatch.Draw(drawComponent.Texture, destination, Color.White);
         }
     }
 }

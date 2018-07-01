@@ -16,11 +16,9 @@ namespace SGame
 
         public void ProcessDraw(GameTime gameTime)
         {
-            var layer = Context.DrawLayerSystem.GetLayer(Layers.Player);
-
-            layer.Begin();
             Context.ProcessingSystemManager.ProcessSystems(gameTime, ProcessType.Draw);
-            layer.End();
+
+            Context.DrawLayerSystem.DrawEntireLayer(Layers.Player);
         }
     }
 }

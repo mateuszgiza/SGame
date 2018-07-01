@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace SGame
 {
@@ -25,6 +26,12 @@ namespace SGame
         public static Entity WithTag(this Entity entity, string tag)
         {
             entity.Tags.AddTag(tag);
+            return entity;
+        }
+
+        public static Entity WithTexture(this Entity entity, Texture2D texture)
+        {
+            entity.Components.Get<DrawComponent>().Texture = texture;
             return entity;
         }
     }
