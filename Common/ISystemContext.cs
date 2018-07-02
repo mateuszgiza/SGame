@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SGame.Managers;
 
 namespace SGame
 {
@@ -11,5 +12,6 @@ namespace SGame
         ProcessingSystemManager ProcessingSystemManager { get; }
         EntityComponentSystem EntityComponentSystem { get; }
         DrawLayerSystem DrawLayerSystem { get; }
+        ContentManager ContentManager { get; }
     }
 }

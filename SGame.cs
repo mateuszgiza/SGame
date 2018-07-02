@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SGame.Common.Names;
 using SGame.Loaders;
+using SGame.Managers;
 
 namespace SGame
 {
@@ -12,8 +13,6 @@ namespace SGame
         private GraphicsDeviceManager graphics;
         private SystemContext Context;
         private FpsCounter FpsCounter;
-        private Texture2D ball;
-        private ContentLoader contentLoader;
 
         public SGame()
         {
@@ -27,8 +26,10 @@ namespace SGame
 
         private void PreInit()
         {
+            var contentLoader = new ContentLoader(Content);
+
             Context = new SystemContext { Game = this };
-            contentLoader = new ContentLoader(Context);
+            Context.ContentManager = new ContentManager(contentLoader);
 
             FpsCounter = new FpsCounter();
         }
@@ -54,7 +55,7 @@ namespace SGame
                     .WithPosition(new Vector2(100, 100))
                     .WithComponent(new PlayerInputComponent())
                     .WithComponent(new DrawComponent())
-                    .WithTexture(ball));
+                    .WithTexture(Context.ContentManager.GetTexture(Textures.Ball)));
 
             Context.DrawLayerSystem
                     .AddLayer(Layers.FpsCounter)
@@ -63,8 +64,7 @@ namespace SGame
 
         protected override void LoadContent()
         {
-            ball = Content.Load<Texture2D>(Textures.Ball);
-            contentLoader.LoadContents();
+            Context.ContentManager.LoadContents();
         }
 
         protected override void Update(GameTime gameTime)

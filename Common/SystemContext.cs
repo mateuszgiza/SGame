@@ -1,5 +1,6 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SGame.Managers;
 
 namespace SGame
 {
@@ -12,6 +13,7 @@ namespace SGame
 
         public Game Game { get; set; }
         public GraphicsDevice GraphicsDevice { get; set; }
+        public ContentManager ContentManager { get; set; }
 
         public SystemManager SystemManager
         {

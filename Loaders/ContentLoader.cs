@@ -4,41 +4,31 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Xna.Framework.Content;
-using Microsoft.Xna.Framework.Graphics;
-using SGame.Common.Names;
 
 namespace SGame.Loaders
 {
     public class ContentLoader
     {
-        private readonly ISystemContext systemContext;
-        private Dictionary<Type, List<object>> contents = new Dictionary<Type, List<object>>();
+        private readonly ContentManager contentManager;
 
-        private ContentManager contentManager => systemContext.Game.Content;
-
-        public ContentLoader(ISystemContext systemContext)
+        public ContentLoader(ContentManager contentManager)
         {
-            this.systemContext = systemContext;
+            this.contentManager = contentManager;
         }
 
-        public void LoadContents()
+        public Dictionary<string, T> LoadContent<T>(string directory)
         {
-            LoadContent<Texture2D>(Textures.Directory);
-            LoadContent<SpriteFont>(Fonts.Directory);
-        }
-
-        private void LoadContent<T>(string directory)
-        {
-            var collection = contents[typeof(T)] = new List<object>();
+            var content = new Dictionary<string, T>();
             var fileNames = GetNamesFromDirectory(directory);
 
             foreach (var fileName in fileNames)
             {
-                var texture = contentManager.Load<T>(fileName);
-                collection.Add(texture);
+                content[fileName] = contentManager.Load<T>(fileName);
             }
 
             LogInfoAboutLoadedContent<T>(fileNames);
+
+            return content;
         }
 
         private void LogInfoAboutLoadedContent<T>(IEnumerable<string> fileNames)
