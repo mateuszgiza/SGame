@@ -2,6 +2,7 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using SGame.Loaders;
 
 namespace SGame
 {
@@ -11,6 +12,7 @@ namespace SGame
         private SystemContext Context;
         private FpsCounter FpsCounter;
         private Texture2D ball;
+        private ContentLoader contentLoader;
 
         public SGame()
         {
@@ -18,16 +20,22 @@ namespace SGame
             Content.RootDirectory = "Content";
             //IsFixedTimeStep = false; // unlock 60fps
             //graphics.SynchronizeWithVerticalRetrace = false; // disable vsync
+
+            PreInit();
+        }
+
+        private void PreInit()
+        {
+            Context = new SystemContext { Game = this };
+            contentLoader = new ContentLoader(Context);
+
+            FpsCounter = new FpsCounter();
         }
 
         protected override void Initialize()
         {
             base.Initialize();
 
-            FpsCounter = new FpsCounter();
-
-            Context = new SystemContext();
-            Context.Game = this;
             Context.GraphicsDevice = GraphicsDevice;
             Context.SystemManager = new SystemManager();
             Context.EntityComponentSystem = new EntityComponentSystem();
@@ -54,7 +62,8 @@ namespace SGame
 
         protected override void LoadContent()
         {
-            ball = Content.Load<Texture2D>("ball");
+            ball = Content.Load<Texture2D>("textures/ball");
+            contentLoader.LoadContents();
         }
 
         protected override void Update(GameTime gameTime)
@@ -74,7 +83,7 @@ namespace SGame
             graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
 
             FpsCounter.Update(gameTime);
-            System.Console.WriteLine($"FPS: {FpsCounter.FramesCount}");
+            //System.Console.WriteLine($"FPS: {FpsCounter.FramesCount}");
 
             Context.SystemManager.ProcessDraw(gameTime);
 
