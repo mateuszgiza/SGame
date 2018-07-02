@@ -23,10 +23,9 @@ namespace SGame
 
         public void ProcessSystems(GameTime gameTime, ProcessType type)
         {
-            foreach (var processingSystem in processingSystems.Where(x => x.Type == type))
-            {
-                processingSystem.Process(gameTime);
-            }
+            processingSystems
+                .Where(ps => ps.Type == type)
+                .ForEach(ps => ps.Process(gameTime));
         }
     }
 }

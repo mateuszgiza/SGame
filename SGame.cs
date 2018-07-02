@@ -68,14 +68,7 @@ namespace SGame
 
         protected override void Update(GameTime gameTime)
         {
-            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
-            {
-                Exit();
-            }
-
             Context.SystemManager.ProcessUpdate(gameTime);
-
-            base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
@@ -86,8 +79,6 @@ namespace SGame
             //System.Console.WriteLine($"FPS: {FpsCounter.FramesCount}");
 
             Context.SystemManager.ProcessDraw(gameTime);
-
-            base.Draw(gameTime);
         }
     }
 }

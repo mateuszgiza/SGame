@@ -28,10 +28,7 @@ namespace SGame
             return this;
         }
 
-        public SpriteBatch GetLayer(string layerName)
-        {
-            return layers[layerName];
-        }
+        public SpriteBatch GetLayer(string layerName) => layers[layerName];
 
         public void DrawEntireLayer(string layerName)
         {

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace SGame
 {
@@ -11,13 +12,15 @@ namespace SGame
 
         public void ProcessUpdate(GameTime gameTime)
         {
-            Context.ProcessingSystemManager.ProcessSystems(gameTime, ProcessType.Update);
+            if (Keyboard.GetState().IsKeyDown(Keys.Escape))
+                Context.Game.Exit();
+            else
+                Context.ProcessingSystemManager.ProcessSystems(gameTime, ProcessType.Update);
         }
 
         public void ProcessDraw(GameTime gameTime)
         {
             Context.ProcessingSystemManager.ProcessSystems(gameTime, ProcessType.Draw);
-
             Context.DrawLayerSystem.DrawEntireLayer(Layers.Player);
         }
     }

@@ -23,14 +23,7 @@ namespace SGame.Managers
             fonts = contentLoader.LoadContent<SpriteFont>(Fonts.Directory);
         }
 
-        public Texture2D GetTexture(string name)
-        {
-            return textures[name];
-        }
-
-        public SpriteFont GetFont(string name)
-        {
-            return fonts[name];
-        }
+        public Texture2D GetTexture(string name)=> textures[name];
+        public SpriteFont GetFont(string name) => fonts[name];
     }
 }
