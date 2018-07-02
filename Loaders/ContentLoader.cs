@@ -5,14 +5,12 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using SGame.Common.Names;
 
 namespace SGame.Loaders
 {
     public class ContentLoader
     {
-        private const string TexturesDirectory = "textures";
-        private const string FontsDirectory = "fonts";
-
         private readonly ISystemContext systemContext;
         private Dictionary<Type, List<object>> contents = new Dictionary<Type, List<object>>();
 
@@ -25,8 +23,8 @@ namespace SGame.Loaders
 
         public void LoadContents()
         {
-            LoadContent<Texture2D>(TexturesDirectory);
-            LoadContent<SpriteFont>(FontsDirectory);
+            LoadContent<Texture2D>(Textures.Directory);
+            LoadContent<SpriteFont>(Fonts.Directory);
         }
 
         private void LoadContent<T>(string directory)

@@ -2,6 +2,7 @@ using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using SGame.Common.Names;
 using SGame.Loaders;
 
 namespace SGame
@@ -62,7 +63,7 @@ namespace SGame
 
         protected override void LoadContent()
         {
-            ball = Content.Load<Texture2D>("textures/ball");
+            ball = Content.Load<Texture2D>(Textures.Ball);
             contentLoader.LoadContents();
         }
 
