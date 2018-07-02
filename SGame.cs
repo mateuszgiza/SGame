@@ -48,14 +48,13 @@ namespace SGame
                     .Register(new PlayerInputProcessingSystem())
                     .Register(new PlayerDrawProcessingSystem());
 
-            Context.EntityComponentSystem.Entities.Add(new Entity()
+            Context.EntityComponentSystem.AddEntity(_ => _
                     .WithTag(Tags.Player)
-                    .WithComponent(new TransformComponent())
-                    .WithSize(new Vector2(50, 50))
-                    .WithPosition(new Vector2(100, 100))
-                    .WithComponent(new PlayerInputComponent())
-                    .WithComponent(new DrawComponent())
-                    .WithTexture(Context.ContentManager.GetTexture(Textures.Ball)));
+                    .WithSize(50, 50)
+                    .WithPosition(100, 100)
+                    .WithComponent<PlayerInputComponent>()
+                    .WithComponent<DrawComponent>()
+                    .WithTexture(Textures.Ball));
 
             Context.DrawLayerSystem
                     .AddLayer(Layers.FpsCounter)

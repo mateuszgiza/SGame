@@ -18,6 +18,11 @@ namespace SGame
             return components.OfType<T>().FirstOrDefault();
         }
 
+        public bool HasComponent<T>() where T : IComponent
+        {
+            return components.OfType<T>().Any();
+        }
+
         public void Attach(IComponent component)
         {
             if (!components.Contains(component))
