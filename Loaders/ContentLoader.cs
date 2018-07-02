@@ -1,6 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace SGame.Loaders
@@ -10,34 +13,50 @@ namespace SGame.Loaders
         private const string TexturesDirectory = "textures";
         private const string FontsDirectory = "fonts";
 
-        private readonly ISystemContext _systemContext;
+        private readonly ISystemContext systemContext;
+        private Dictionary<Type, List<object>> contents = new Dictionary<Type, List<object>>();
 
-        private List<Texture2D> textures = new List<Texture2D>();
+        private ContentManager contentManager => systemContext.Game.Content;
 
         public ContentLoader(ISystemContext systemContext)
         {
-            _systemContext = systemContext;
+            this.systemContext = systemContext;
         }
 
         public void LoadContents()
         {
-            LoadTextures();
-            System.Console.WriteLine($"Loaded {textures.Count} textures!: {{ {string.Join(", ", textures)} }}");
+            LoadContent<Texture2D>(TexturesDirectory);
+            LoadContent<SpriteFont>(FontsDirectory);
         }
 
-        private void LoadTextures() {
-            var fileNames = GetNamesFromDirectory(TexturesDirectory);
-            System.Console.WriteLine($"fileNames: {string.Join(",", fileNames)}");
-            foreach(var fileName in fileNames) {
-                var texture = _systemContext.Game.Content.Load<Texture2D>(fileName);
-                textures.Add(texture);
+        private void LoadContent<T>(string directory)
+        {
+            var collection = contents[typeof(T)] = new List<object>();
+            var fileNames = GetNamesFromDirectory(directory);
+
+            foreach (var fileName in fileNames)
+            {
+                var texture = contentManager.Load<T>(fileName);
+                collection.Add(texture);
             }
+
+            LogInfoAboutLoadedContent<T>(fileNames);
         }
 
-        private IEnumerable<string> GetNamesFromDirectory(string path) {
-            var combinedPath = Path.Combine(@".\", _systemContext.Game.Content.RootDirectory, path);
-            var filePaths = Directory.GetFiles(combinedPath);
-            var fileNames = filePaths.Select(x => Path.Combine(TexturesDirectory, Path.GetFileNameWithoutExtension(x)));
+        private void LogInfoAboutLoadedContent<T>(IEnumerable<string> fileNames)
+        {
+            var typeName = typeof(T).Name;
+            var count = fileNames.Count();
+            var items = string.Join(", ", fileNames);
+            System.Console.WriteLine($"Loaded<{typeName}>({count}): {{ {items} }}");
+        }
+
+        private IEnumerable<string> GetNamesFromDirectory(string subDirectory)
+        {
+            var appDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            var contentDirectory = Path.Combine(appDirectory, contentManager.RootDirectory, subDirectory);
+            var filePaths = Directory.GetFiles(contentDirectory, "*.xnb");
+            var fileNames = filePaths.Select(x => Path.Combine(subDirectory, Path.GetFileNameWithoutExtension(x)));
             return fileNames;
         }
     }
