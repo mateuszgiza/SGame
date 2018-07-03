@@ -20,7 +20,6 @@ namespace SGame
             var transform = player.Components.Get<TransformComponent>();
             var drawComponent = player.Components.Get<DrawComponent>();
 
-            var playerOrigin = transform.Position + transform.Size / 2;
             var destination = new Rectangle(transform.Position.ToPoint(), transform.Size.ToPoint());
 
             spriteBatch.Draw(drawComponent.Texture, destination, Color.White);
