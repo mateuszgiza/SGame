@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Input;
 using SGame.Common.Names;
 using SGame.Loaders;
 using SGame.Managers;
+using SGame.ProcessingSystems;
 
 namespace SGame
 {
@@ -12,7 +13,6 @@ namespace SGame
     {
         private GraphicsDeviceManager graphics;
         private SystemContext Context;
-        private FpsCounter FpsCounter;
 
         public SGame()
         {
@@ -30,8 +30,6 @@ namespace SGame
 
             Context = new SystemContext { Game = this };
             Context.ContentManager = new ContentManager(contentLoader);
-
-            FpsCounter = new FpsCounter();
         }
 
         protected override void Initialize()
@@ -46,7 +44,8 @@ namespace SGame
 
             Context.ProcessingSystemManager
                     .Register(new PlayerInputProcessingSystem())
-                    .Register(new PlayerDrawProcessingSystem());
+                    .Register(new PlayerDrawProcessingSystem())
+                    .Register(new FpsCounterProcessingSystem());
 
             Context.EntityComponentSystem.AddEntity(_ => _
                     .WithTag(Tags.Player)
@@ -74,10 +73,6 @@ namespace SGame
         protected override void Draw(GameTime gameTime)
         {
             graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
-
-            FpsCounter.Update(gameTime);
-            //System.Console.WriteLine($"FPS: {FpsCounter.FramesCount}");
-
             Context.SystemManager.ProcessDraw(gameTime);
         }
     }
