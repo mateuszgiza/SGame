@@ -32,3 +32,10 @@
 /processorParam:TextureFormat=Compressed
 /build:fonts/arial-22.spritefont
 
+#begin fonts/arial-16.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:fonts/arial-16.spritefont
+

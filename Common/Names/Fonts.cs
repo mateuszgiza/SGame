@@ -4,8 +4,9 @@ namespace SGame.Common.Names
     {
         internal const string Directory = "fonts/";
 
-        public const string Default = Arial_22;
+        public const string Default = Arial_16;
 
         public const string Arial_22 = Directory + "arial-22";
+        public const string Arial_16 = Directory + "arial-16";
     }
 }
