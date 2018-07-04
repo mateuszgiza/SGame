@@ -4,5 +4,6 @@ namespace SGame
     {
         public const string FpsCounter = nameof(FpsCounter);
         public const string Player = nameof(Player);
+        public const string Objects = nameof(Objects);
     }
 }
