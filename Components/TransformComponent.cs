@@ -15,5 +15,6 @@ namespace SGame
             get => originOffset.HasValue ? Position + originOffset.Value : Position + Center;
             set => originOffset = value;
         }
+        public Rectangle Destination => new Rectangle(Position.ToPoint(), Size.ToPoint());
     }
 }
