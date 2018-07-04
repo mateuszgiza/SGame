@@ -23,6 +23,7 @@ namespace SGame
             Context.ProcessingSystemManager.ProcessSystems(gameTime, ProcessType.Draw);
             Context.DrawLayerSystem.DrawEntireLayer(Layers.FpsCounter);
             Context.DrawLayerSystem.DrawEntireLayer(Layers.Player);
+            Context.DrawLayerSystem.DrawEntireLayer(Layers.Objects);
         }
     }
 }
