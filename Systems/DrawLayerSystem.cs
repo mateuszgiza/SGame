@@ -33,7 +33,10 @@ namespace SGame
         public void DrawEntireLayer(string layerName)
         {
             var layer = GetLayer(layerName);
-            layer.Begin();
+            if (layerName == Layers.FrontEffects || layerName == Layers.BackEffects)
+                layer.Begin(SpriteSortMode.Immediate, BlendState.Additive);
+            else
+                layer.Begin();
 
             foreach (var drawAction in drawActions[layerName])
             {

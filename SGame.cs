@@ -82,11 +82,11 @@ namespace SGame
             lightBatch.End();
 
             GraphicsDevice.SetRenderTarget(mainTarget);
-            GraphicsDevice.Clear(Color.Black);
+            GraphicsDevice.Clear(Color.Transparent);
             Context.SystemManager.ProcessDraw(gameTime);
 
             GraphicsDevice.SetRenderTarget(null);
-            GraphicsDevice.Clear(Color.Black);
+            GraphicsDevice.Clear(Color.CornflowerBlue);
 
             var spriteBatch = Context.DrawLayerSystem.GetLayer(Layers.Objects);
 

@@ -10,12 +10,26 @@ namespace SGame.ProcessingSystems
         public override void Process(GameTime gameTime)
         {
             EntityComponentSystem.Context.DrawLayerSystem.DrawOnLayer(Layers.Objects, DrawObjects);
+            EntityComponentSystem.Context.DrawLayerSystem.DrawOnLayer(Layers.FrontEffects, DrawLight);
         }
 
         private void DrawObjects(SpriteBatch spriteBatch)
         {
             var objects = EntityComponentSystem.Entities.GetByTag(Tags.Object);
             objects.ForEach(o => DrawTexture(spriteBatch, o));
+        }
+
+        private void DrawLight(SpriteBatch spriteBatch)
+        {
+            var objects = EntityComponentSystem.Entities.GetByTag(Tags.Object);
+            foreach (var obj in objects)
+            {
+                var transform = obj.Components.Get<TransformComponent>();
+                var light = EntityComponentSystem.Context.ContentManager.GetTexture(Common.Names.Textures.LightMask);
+                var off = transform.Destination;
+                off.Offset(transform.Size.X, transform.Size.Y);
+                spriteBatch.Draw(light, off, Color.White);
+            }
         }
 
         private void DrawTexture(SpriteBatch spriteBatch, Entity entity)

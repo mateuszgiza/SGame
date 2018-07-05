@@ -24,6 +24,8 @@ namespace SGame
             Context.DrawLayerSystem.DrawEntireLayer(Layers.FpsCounter);
             Context.DrawLayerSystem.DrawEntireLayer(Layers.Player);
             Context.DrawLayerSystem.DrawEntireLayer(Layers.Objects);
+            //Context.DrawLayerSystem.DrawEntireLayer(Layers.FrontEffects);
+            //Context.DrawLayerSystem.DrawEntireLayer(Layers.BackEffects);
         }
     }
 }
