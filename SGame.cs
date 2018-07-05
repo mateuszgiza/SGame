@@ -14,6 +14,10 @@ namespace SGame
         private GraphicsDeviceManager graphics;
         private SystemContext Context;
 
+        private Effect lightEffect;
+        private RenderTarget2D lightsTarget;
+        private RenderTarget2D mainTarget;
+
         public SGame()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -45,11 +49,19 @@ namespace SGame
             RegisterProcessingSystems();
             CreateLayers();
             CreateEntities();
+
+            lightBatch = new SpriteBatch(GraphicsDevice);
         }
 
         protected override void LoadContent()
         {
             Context.ContentManager.LoadContents();
+
+            lightEffect = Content.Load<Effect>("shaders/light");
+
+            var pp = GraphicsDevice.PresentationParameters;
+            lightsTarget = new RenderTarget2D(GraphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight);
+            mainTarget = new RenderTarget2D(GraphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight);
         }
 
         protected override void Update(GameTime gameTime)
@@ -57,10 +69,31 @@ namespace SGame
             Context.SystemManager.ProcessUpdate(gameTime);
         }
 
+        private SpriteBatch lightBatch;
+
         protected override void Draw(GameTime gameTime)
         {
-            graphics.GraphicsDevice.Clear(Color.CornflowerBlue);
+            graphics.GraphicsDevice.SetRenderTarget(lightsTarget);
+            graphics.GraphicsDevice.Clear(Color.Black);
+
+            lightBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive);
+            lightBatch.Draw(Context.ContentManager.GetTexture(Textures.LightMask2), Vector2.One * 100, Color.White);
+            lightBatch.End();
+
+            GraphicsDevice.SetRenderTarget(mainTarget);
+            GraphicsDevice.Clear(Color.Black);
             Context.SystemManager.ProcessDraw(gameTime);
+
+            GraphicsDevice.SetRenderTarget(null);
+            GraphicsDevice.Clear(Color.Black);
+
+            var spriteBatch = Context.DrawLayerSystem.GetLayer(Layers.Objects);
+
+            lightEffect.Parameters["lightMask"].SetValue(lightsTarget);
+            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+            lightEffect.CurrentTechnique.Passes[0].Apply();
+            spriteBatch.Draw(mainTarget, Vector2.Zero, Color.White);
+            spriteBatch.End();
         }
 
         private void RegisterProcessingSystems()
@@ -77,7 +110,9 @@ namespace SGame
             Context.DrawLayerSystem
                     .AddLayer(Layers.FpsCounter)
                     .AddLayer(Layers.Player)
-                    .AddLayer(Layers.Objects);
+                    .AddLayer(Layers.Objects)
+                    .AddLayer(Layers.FrontEffects)
+                    .AddLayer(Layers.BackEffects);
         }
 
         private void CreateEntities()
