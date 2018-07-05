@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SGame.Common.Names;
+using SGame.Components;
 using SGame.Loaders;
 using SGame.Managers;
 using SGame.ProcessingSystems;
@@ -102,6 +103,7 @@ namespace SGame
                     .Register(new PlayerInputProcessingSystem())
                     .Register(new PlayerDrawProcessingSystem())
                     .Register(new FpsCounterProcessingSystem())
+                    .Register(new FpsCounterDrawProcessingSystem())
                     .Register(new ObjectDrawProcessingSystem());
         }
 
@@ -117,6 +119,10 @@ namespace SGame
 
         private void CreateEntities()
         {
+            Context.EntityComponentSystem.AddEntity(_ => _
+                    .WithTag(Tags.FpsCounter)
+                    .WithComponent<FpsCounterComponent>());
+
             Context.EntityComponentSystem.AddEntity(_ => _
                     .WithTag(Tags.Player)
                     .WithSize(50, 50)

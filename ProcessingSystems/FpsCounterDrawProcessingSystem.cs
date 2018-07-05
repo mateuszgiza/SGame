@@ -1,25 +1,38 @@
+using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SGame.Common.Names;
+using SGame.Components;
 
 namespace SGame.ProcessingSystems
 {
-    public class FpsCounterProcessingSystem : ProcessingSystem
+    public class FpsCounterDrawProcessingSystem : ProcessingSystem
     {
         public override ProcessType Type => ProcessType.Draw;
 
-        private FpsCounter fpsCounter = new FpsCounter();
-
         public override void Process(GameTime gameTime)
         {
-            fpsCounter.Update(gameTime);
+            EntityComponentSystem.Entities
+                .GetByTag(Tags.FpsCounter)?.FirstOrDefault()
+                ?.Components.Get<FpsCounterComponent>()
+                .DrawCounter.Update(gameTime);
+
             EntityComponentSystem.Context.DrawLayerSystem.DrawOnLayer(Layers.FpsCounter, DrawCounter);
         }
 
         private void DrawCounter(SpriteBatch spriteBatch)
         {
+            var counter = EntityComponentSystem.Entities
+                .GetByTag(Tags.FpsCounter)?.FirstOrDefault()
+                ?.Components.Get<FpsCounterComponent>();
+
+            if (counter == null)
+                return;
+
+            var text = $"FPS: {counter.DrawCounter.FramesCount}\nUpdate: {counter.UpdateCounter.FramesCount}";
             var font = EntityComponentSystem.Context.ContentManager.GetFont(Fonts.Default);
-            spriteBatch.DrawString(font, $"FPS: {fpsCounter.FramesCount}", Vector2.Zero, Color.Magenta);
+            
+            spriteBatch.DrawString(font, text, Vector2.Zero, Color.Magenta);
         }
     }
 }
