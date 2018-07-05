@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Text;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SGame.Common.Names;
@@ -29,10 +30,13 @@ namespace SGame.ProcessingSystems
             if (counter == null)
                 return;
 
-            var text = $"FPS: {counter.DrawCounter.FramesCount}\nUpdate: {counter.UpdateCounter.FramesCount}";
-            var font = EntityComponentSystem.Context.ContentManager.GetFont(Fonts.Default);
+            var textBuilder = new StringBuilder();
+            textBuilder.AppendLine($"FPS: {counter.DrawCounter.FramesCount}");
+            textBuilder.AppendLine($"Update: {counter.UpdateCounter.FramesCount}");
+            textBuilder.AppendLine($"FixedUpdate: {counter.FixedUpdateCounter.FramesCount}");
             
-            spriteBatch.DrawString(font, text, Vector2.Zero, Color.Magenta);
+            var font = EntityComponentSystem.Context.ContentManager.GetFont(Fonts.Default);
+            spriteBatch.DrawString(font, textBuilder, Vector2.Zero, Color.Magenta);
         }
     }
 }

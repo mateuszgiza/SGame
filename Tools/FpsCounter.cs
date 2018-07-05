@@ -9,7 +9,8 @@ namespace SGame
         private int lastFramesCount;
 
         private TimeSpan elapsedTime;
-        private TimeSpan OneSecond = TimeSpan.FromSeconds(1);
+        private static TimeSpan OneSecond = TimeSpan.FromSeconds(1);
+        public TimeSpan MaxElapsedTime { get; set; } = OneSecond;
 
         public int FramesCount => lastFramesCount;
 
@@ -18,9 +19,9 @@ namespace SGame
             frameCounter++;
             elapsedTime += gameTime.ElapsedGameTime;
 
-            if (elapsedTime >= OneSecond)
+            if (elapsedTime >= MaxElapsedTime)
             {
-                elapsedTime -= OneSecond;
+                elapsedTime -= MaxElapsedTime;
                 lastFramesCount = frameCounter;
                 frameCounter = 0;
             }

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -19,12 +20,15 @@ namespace SGame
         private RenderTarget2D lightsTarget;
         private RenderTarget2D mainTarget;
 
+        private TimeSpan maxFixedUpdateElapsedTime = TimeSpan.FromSeconds(1/30f);
+        private TimeSpan fixedUpdateElapsedTime;
+
         public SGame()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             //IsFixedTimeStep = false; // unlock 60fps
-            //graphics.SynchronizeWithVerticalRetrace = false; // disable vsync
+            graphics.SynchronizeWithVerticalRetrace = false; // disable vsync
 
             PreInit();
         }
@@ -67,6 +71,17 @@ namespace SGame
 
         protected override void Update(GameTime gameTime)
         {
+            fixedUpdateElapsedTime += gameTime.ElapsedGameTime;
+            if (fixedUpdateElapsedTime >= maxFixedUpdateElapsedTime)
+            {
+                Context.EntityComponentSystem.Entities
+                    .GetByTag(Tags.FpsCounter).FirstOrDefault()
+                    .Components.Get<FpsCounterComponent>()
+                    .FixedUpdateCounter.Update(new GameTime(fixedUpdateElapsedTime, fixedUpdateElapsedTime));
+                
+                fixedUpdateElapsedTime -= maxFixedUpdateElapsedTime;
+            }
+
             Context.SystemManager.ProcessUpdate(gameTime);
         }
 
