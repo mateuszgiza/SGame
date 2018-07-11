@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using SGame.Common.Names;
+using SGame.Common.Setups;
 using SGame.Components;
 using SGame.Loaders;
 using SGame.Managers;
@@ -16,8 +17,6 @@ namespace SGame
         private SystemContext Context;
 
         private Effect lightEffect;
-        private RenderTarget2D lightsTarget;
-        private RenderTarget2D mainTarget;
 
         public SGame()
         {
@@ -41,11 +40,20 @@ namespace SGame
         {
             base.Initialize();
 
+            var pp = GraphicsDevice.PresentationParameters;
+            var renderTargetsContainer = new RenderTargetsContainer(GraphicsDevice);
+            renderTargetsContainer.Create(RenderTargets.Main, pp.BackBufferWidth, pp.BackBufferHeight);
+            renderTargetsContainer.Create(RenderTargets.FpsCounter, pp.BackBufferWidth, pp.BackBufferHeight);
+            renderTargetsContainer.Create(RenderTargets.Objects, pp.BackBufferWidth, pp.BackBufferHeight);
+            renderTargetsContainer.Create(RenderTargets.Player, pp.BackBufferWidth, pp.BackBufferHeight);
+            renderTargetsContainer.Create(RenderTargets.Lights, pp.BackBufferWidth, pp.BackBufferHeight);
+
             Context.GraphicsDevice = GraphicsDevice;
             Context.SystemManager = new SystemManager();
             Context.EntityComponentSystem = new EntityComponentSystem();
             Context.ProcessingSystemManager = new ProcessingSystemManager();
-            Context.DrawLayerSystem = new DrawLayerSystem();
+            Context.DrawLayerSystem = new DrawLayerSystem(renderTargetsContainer, GraphicsDevice);
+            Context.DrawLayerSystem.lightEffect = lightEffect;
 
             RegisterProcessingSystems();
             CreateLayers();
@@ -59,10 +67,6 @@ namespace SGame
             Context.ContentManager.LoadContents();
 
             lightEffect = Content.Load<Effect>("shaders/light");
-
-            var pp = GraphicsDevice.PresentationParameters;
-            lightsTarget = new RenderTarget2D(GraphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight);
-            mainTarget = new RenderTarget2D(GraphicsDevice, pp.BackBufferWidth, pp.BackBufferHeight);
         }
 
         protected override void Update(GameTime gameTime)
@@ -74,27 +78,16 @@ namespace SGame
 
         protected override void Draw(GameTime gameTime)
         {
-            graphics.GraphicsDevice.SetRenderTarget(lightsTarget);
-            graphics.GraphicsDevice.Clear(Color.Black);
+            Context.DrawLayerSystem.DrawOnLayer(Layers.Lights, drawer =>
+                drawer.Draw(Context.ContentManager.GetTexture(Textures.LightMask2), Vector2.One * 100, Color.White));
 
-            lightBatch.Begin(SpriteSortMode.Immediate, BlendState.Additive);
-            lightBatch.Draw(Context.ContentManager.GetTexture(Textures.LightMask2), Vector2.One * 100, Color.White);
-            lightBatch.End();
-
-            GraphicsDevice.SetRenderTarget(mainTarget);
-            GraphicsDevice.Clear(Color.Transparent);
             Context.SystemManager.ProcessDraw(gameTime);
 
-            GraphicsDevice.SetRenderTarget(null);
-            GraphicsDevice.Clear(Color.CornflowerBlue);
-
-            var spriteBatch = Context.DrawLayerSystem.GetLayer(Layers.Objects);
-
-            lightEffect.Parameters["lightMask"].SetValue(lightsTarget);
-            spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
-            lightEffect.CurrentTechnique.Passes[0].Apply();
-            spriteBatch.Draw(mainTarget, Vector2.Zero, Color.White);
-            spriteBatch.End();
+            Context.DrawLayerSystem.RenderSpecifiedTargets(
+                RenderTargets.Objects,
+                RenderTargets.Player,
+                RenderTargets.FpsCounter
+            );
         }
 
         private void RegisterProcessingSystems()
@@ -110,11 +103,12 @@ namespace SGame
         private void CreateLayers()
         {
             Context.DrawLayerSystem
-                    .AddLayer(Layers.FpsCounter)
-                    .AddLayer(Layers.Player)
-                    .AddLayer(Layers.Objects)
-                    .AddLayer(Layers.FrontEffects)
-                    .AddLayer(Layers.BackEffects);
+                    .AddLayer(Layers.Lights, LayerSetups.Lights)
+                    .AddLayer(Layers.FpsCounter, LayerSetups.FpsCounter)
+                    .AddLayer(Layers.Player, LayerSetups.Player)
+                    .AddLayer(Layers.Objects, LayerSetups.Objects);
+            //.AddLayer(Layers.FrontEffects)
+            //.AddLayer(Layers.BackEffects);
         }
 
         private void CreateEntities()
@@ -130,11 +124,13 @@ namespace SGame
                     .WithComponent<PlayerInputComponent>()
                     .WithTexture(Textures.Ball));
 
-            Context.EntityComponentSystem.AddEntity(_ => _
-                    .WithTag(Tags.Object)
-                    .WithSize(64, 64)
-                    .WithPosition(200, 200)
-                    .WithTexture(Textures.Brick));
+            for (int x = 0; x < GraphicsDevice.PresentationParameters.BackBufferWidth; x += 64)
+                for (int y = 0; y < GraphicsDevice.PresentationParameters.BackBufferWidth; y += 64)
+                    Context.EntityComponentSystem.AddEntity(_ => _
+                        .WithTag(Tags.Object)
+                        .WithSize(64, 64)
+                        .WithPosition(x, y)
+                        .WithTexture(Textures.Brick));
         }
     }
 }

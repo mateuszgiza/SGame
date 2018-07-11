@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SGame.Common;
+using SGame.Common.Names;
+using SGame.Managers;
 
 namespace SGame
 {
@@ -8,16 +12,27 @@ namespace SGame
     {
         public delegate void DrawAction(SpriteBatch spriteBatch);
 
-        private Dictionary<string, SpriteBatch> layers = new Dictionary<string, SpriteBatch>();
+        private Dictionary<string, LayerSettings> layers = new Dictionary<string, LayerSettings>();
         private Dictionary<string, List<DrawAction>> drawActions = new Dictionary<string, List<DrawAction>>();
+
+        private SpriteBatch spriteBatch;
+        private readonly RenderTargetsContainer renderTargetsContainer;
 
         public ISystemContext Context { get; set; }
 
-        public DrawLayerSystem AddLayer(string layerName)
+        public Effect lightEffect { get; set; }
+
+        public DrawLayerSystem(RenderTargetsContainer renderTargetsContainer, GraphicsDevice graphicsDevice)
+        {
+            spriteBatch = new SpriteBatch(graphicsDevice);
+            this.renderTargetsContainer = renderTargetsContainer;
+        }
+
+        public DrawLayerSystem AddLayer(string layerName, LayerSettings layerSettings)
         {
             if (!layers.ContainsKey(layerName))
             {
-                layers[layerName] = new SpriteBatch(Context.GraphicsDevice);
+                layers[layerName] = layerSettings;
                 drawActions[layerName] = new List<DrawAction>();
             }
             else
@@ -28,24 +43,55 @@ namespace SGame
             return this;
         }
 
-        public SpriteBatch GetLayer(string layerName) => layers[layerName];
+        public LayerSettings GetLayer(string layerName) => layers[layerName];
 
         public void DrawEntireLayer(string layerName)
         {
             var layer = GetLayer(layerName);
-            if (layerName == Layers.FrontEffects || layerName == Layers.BackEffects)
-                layer.Begin(SpriteSortMode.Immediate, BlendState.Additive);
-            else
-                layer.Begin();
+            var renderTarget = renderTargetsContainer.GetRenderTarget(layer.RenderTargetName);
+
+            Context.GraphicsDevice.SetRenderTarget(renderTarget);
+            Context.GraphicsDevice.Clear(layer.ClearColor);
+
+            spriteBatch.Begin(layer.SpriteSortMode, layer.BlendState);
 
             foreach (var drawAction in drawActions[layerName])
             {
-                drawAction.Invoke(layer);
+                drawAction.Invoke(spriteBatch);
             }
 
-            layer.End();
+            spriteBatch.End();
 
             drawActions[layerName].Clear();
+        }
+
+        public void RenderSpecifiedTargets(params string[] targetNames)
+        {
+            Context.GraphicsDevice.SetRenderTarget(null);
+            Context.GraphicsDevice.Clear(Color.Transparent);
+
+            targetNames.ForEach(RenderTarget);
+        }
+
+        public void RenderTarget(string targetName)
+        {
+            var renderTarget = renderTargetsContainer.GetRenderTarget(targetName);
+
+            var layerOptions = GetLayer(targetName);
+            if (layerOptions?.IgnoreLight ?? false)
+            {
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+            }
+            else
+            {
+                var lightsRenderTarget = renderTargetsContainer.GetRenderTarget(RenderTargets.Lights);
+                lightEffect.Parameters["lightMask"].SetValue(lightsRenderTarget);
+                spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
+                lightEffect.CurrentTechnique.Passes[0].Apply();
+            }
+
+            spriteBatch.Draw(renderTarget, Vector2.Zero, Color.White);
+            spriteBatch.End();
         }
 
         public void DrawOnLayer(string layer, DrawAction drawAction)

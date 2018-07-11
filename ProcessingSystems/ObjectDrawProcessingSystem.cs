@@ -10,7 +10,7 @@ namespace SGame.ProcessingSystems
         public override void Process(GameTime gameTime)
         {
             EntityComponentSystem.Context.DrawLayerSystem.DrawOnLayer(Layers.Objects, DrawObjects);
-            EntityComponentSystem.Context.DrawLayerSystem.DrawOnLayer(Layers.FrontEffects, DrawLight);
+            //EntityComponentSystem.Context.DrawLayerSystem.DrawOnLayer(Layers.FrontEffects, DrawLight);
         }
 
         private void DrawObjects(SpriteBatch spriteBatch)

@@ -21,9 +21,10 @@ namespace SGame
         public void ProcessDraw(GameTime gameTime)
         {
             Context.ProcessingSystemManager.ProcessSystems(gameTime, ProcessType.Draw);
+            Context.DrawLayerSystem.DrawEntireLayer(Layers.Lights);
             Context.DrawLayerSystem.DrawEntireLayer(Layers.FpsCounter);
-            Context.DrawLayerSystem.DrawEntireLayer(Layers.Player);
             Context.DrawLayerSystem.DrawEntireLayer(Layers.Objects);
+            Context.DrawLayerSystem.DrawEntireLayer(Layers.Player);
             //Context.DrawLayerSystem.DrawEntireLayer(Layers.FrontEffects);
             //Context.DrawLayerSystem.DrawEntireLayer(Layers.BackEffects);
         }
