@@ -10,7 +10,7 @@ namespace SGame.ProcessingSystems
         public override void Process(GameTime gameTime)
         {
             EntityComponentSystem.Context.DrawLayerSystem.DrawOnLayer(Layers.Objects, DrawObjects);
-            //EntityComponentSystem.Context.DrawLayerSystem.DrawOnLayer(Layers.FrontEffects, DrawLight);
+            EntityComponentSystem.Context.DrawLayerSystem.DrawOnLayer(Layers.Lights, DrawLight);
         }
 
         private void DrawObjects(SpriteBatch spriteBatch)
@@ -21,15 +21,11 @@ namespace SGame.ProcessingSystems
 
         private void DrawLight(SpriteBatch spriteBatch)
         {
-            var objects = EntityComponentSystem.Entities.GetByTag(Tags.Object);
-            foreach (var obj in objects)
-            {
-                var transform = obj.Components.Get<TransformComponent>();
-                var light = EntityComponentSystem.Context.ContentManager.GetTexture(Common.Names.Textures.LightMask);
-                var off = transform.Destination;
-                off.Offset(transform.Size.X, transform.Size.Y);
-                spriteBatch.Draw(light, off, Color.White);
-            }
+            var light = EntityComponentSystem.Context.ContentManager.GetTexture(Common.Names.Textures.LightMask2);
+            spriteBatch.Draw(light, new Vector2(100, 100), Color.White);
+            spriteBatch.Draw(light, new Vector2(350, 200), Color.Yellow);
+            spriteBatch.Draw(light, new Vector2(350, 50), Color.Blue);
+            spriteBatch.Draw(light, new Vector2(400, 100), Color.Red);
         }
 
         private void DrawTexture(SpriteBatch spriteBatch, Entity entity)

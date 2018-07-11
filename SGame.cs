@@ -78,9 +78,6 @@ namespace SGame
 
         protected override void Draw(GameTime gameTime)
         {
-            Context.DrawLayerSystem.DrawOnLayer(Layers.Lights, drawer =>
-                drawer.Draw(Context.ContentManager.GetTexture(Textures.LightMask2), Vector2.One * 100, Color.White));
-
             Context.SystemManager.ProcessDraw(gameTime);
 
             Context.DrawLayerSystem.RenderSpecifiedTargets(
