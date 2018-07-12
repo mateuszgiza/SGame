@@ -22,8 +22,6 @@ namespace SGame
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            //IsFixedTimeStep = false; // unlock 60fps
-            //graphics.SynchronizeWithVerticalRetrace = false; // disable vsync
 
             PreInit();
         }
@@ -71,6 +69,7 @@ namespace SGame
 
         protected override void Update(GameTime gameTime)
         {
+            CheckKeysForLockingOrUnlockingFramerate();
             Context.SystemManager.ProcessUpdate(gameTime);
         }
 
@@ -128,6 +127,20 @@ namespace SGame
                         .WithSize(64, 64)
                         .WithPosition(x, y)
                         .WithTexture(Textures.Brick));
+        }
+
+        private void CheckKeysForLockingOrUnlockingFramerate()
+        {
+            var keyState = Keyboard.GetState();
+            var isUnlock = keyState.IsKeyDown(Keys.O);
+            var isLock = keyState.IsKeyDown(Keys.L);
+
+            if (isLock || isUnlock)
+            {
+                IsFixedTimeStep = isLock; // unlock 60fps
+                graphics.SynchronizeWithVerticalRetrace = isLock; // disable vsync
+                graphics.ApplyChanges();
+            }
         }
     }
 }
