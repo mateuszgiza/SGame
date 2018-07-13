@@ -20,8 +20,6 @@ namespace SGame
 
         public ISystemContext Context { get; set; }
 
-        public Effect lightEffect { get; set; }
-
         public DrawLayerSystem(RenderTargetsContainer renderTargetsContainer, GraphicsDevice graphicsDevice)
         {
             spriteBatch = new SpriteBatch(graphicsDevice);
@@ -84,7 +82,9 @@ namespace SGame
             }
             else
             {
+                var lightEffect = Context.ContentManager.GetEffect(Effects.Light);
                 var lightsRenderTarget = renderTargetsContainer.GetRenderTarget(RenderTargets.Lights);
+                
                 lightEffect.Parameters["lightMask"].SetValue(lightsRenderTarget);
                 spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
                 lightEffect.CurrentTechnique.Passes[0].Apply();

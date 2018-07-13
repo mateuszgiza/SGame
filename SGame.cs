@@ -16,8 +16,6 @@ namespace SGame
         private GraphicsDeviceManager graphics;
         private SystemContext Context;
 
-        private Effect lightEffect;
-
         public SGame()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -51,7 +49,6 @@ namespace SGame
             Context.EntityComponentSystem = new EntityComponentSystem();
             Context.ProcessingSystemManager = new ProcessingSystemManager();
             Context.DrawLayerSystem = new DrawLayerSystem(renderTargetsContainer, GraphicsDevice);
-            Context.DrawLayerSystem.lightEffect = lightEffect;
 
             RegisterProcessingSystems();
             CreateLayers();
@@ -63,8 +60,6 @@ namespace SGame
         protected override void LoadContent()
         {
             Context.ContentManager.LoadContents();
-
-            lightEffect = Content.Load<Effect>("shaders/light");
         }
 
         protected override void Update(GameTime gameTime)

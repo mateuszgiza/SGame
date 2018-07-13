@@ -11,6 +11,7 @@ namespace SGame.Managers
 
         private Dictionary<string, Texture2D> textures;
         private Dictionary<string, SpriteFont> fonts;
+        private Dictionary<string, Effect> effects;
 
         public ContentManager(ContentLoader contentLoader)
         {
@@ -21,9 +22,11 @@ namespace SGame.Managers
         {
             textures = contentLoader.LoadContent<Texture2D>(Textures.Directory);
             fonts = contentLoader.LoadContent<SpriteFont>(Fonts.Directory);
+            effects = contentLoader.LoadContent<Effect>(Effects.Directory);
         }
 
         public Texture2D GetTexture(string name)=> textures[name];
         public SpriteFont GetFont(string name) => fonts[name];
+        public Effect GetEffect(string name) => effects[name];
     }
 }
