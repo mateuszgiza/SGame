@@ -26,7 +26,8 @@ namespace SGame
             if (keyState.IsKeyDown(inputComponent.MoveDown))
                 direction += Vector2.UnitY;
 
-            transform.Position += direction * inputComponent.Speed;
+            //transform.Position += direction * inputComponent.Speed;
+            transform.Position = Mouse.GetState().Position.ToVector2();            
         }
     }
 }
