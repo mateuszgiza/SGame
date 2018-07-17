@@ -11,10 +11,12 @@ namespace poc_quadtree
         private readonly GraphicsDeviceManager graphics;
         private SpriteBatch sprite;
         private List<Rectangle> net = new List<Rectangle>();
+        private Rectangle? collisionRect;
 
         public QuadTreeGame()
         {
             graphics = new GraphicsDeviceManager(this);
+            IsMouseVisible = true;
         }
 
         protected override void Initialize()
@@ -35,6 +37,8 @@ namespace poc_quadtree
             var keyState = Keyboard.GetState();
             if (keyState.IsKeyDown(Keys.Escape))
                 Exit();
+            else
+                CheckCollisions();
         }
 
         protected override void Draw(GameTime gameTime)
@@ -44,9 +48,24 @@ namespace poc_quadtree
             sprite.Begin();
 
             foreach (var netItem in net)
-                sprite.DrawRectangle(netItem, Color.Gray);
+            {
+                var isTheSameRect = collisionRect == netItem;
+                var color = isTheSameRect ? Color.Red : Color.FromNonPremultiplied(255, 255, 255, 25);
+                sprite.DrawRectangle(netItem, color);
+            }
 
             sprite.End();
+        }
+
+        private void CheckCollisions()
+        {
+            var mouseState = Mouse.GetState();
+            var mousePosition = mouseState.Position;
+            var mouseRect = new Rectangle(mousePosition, Point.Zero);
+
+            foreach (var netItem in net)
+                if (netItem.Intersects(mouseRect))
+                    collisionRect = netItem;
         }
     }
 }
