@@ -35,7 +35,7 @@ namespace poc_quadtree
 
             int width = GraphicsDevice.PresentationParameters.BackBufferWidth;
             int height = GraphicsDevice.PresentationParameters.BackBufferHeight;
-            const int QuadSize = 32;
+            const int QuadSize = 16;
             const int MaxPoints = 2048;
 
             var windowBoundaries = new Rectangle(0, 0, width, height);
@@ -55,11 +55,20 @@ namespace poc_quadtree
                 allPoints.Add(point);
             }
 
-            for (int i = 0; i < MaxPoints; ++i)
+            for (int i = 0; i < MaxPoints/2; ++i)
             {
                 var x = rand.Next(0, width);
                 var y = rand.Next(0, height);
                 var rect = new Rectangle(x, y, 5, 5);
+                objects.Insert(rect);
+                allRects.Add(rect);
+            }
+
+            for (int i = 0; i < MaxPoints/2; ++i)
+            {
+                var x = rand.Next(0, width);
+                var y = rand.Next(0, height);
+                var rect = new Rectangle(x, y, 20, 20);
                 objects.Insert(rect);
                 allRects.Add(rect);
             }
@@ -223,26 +232,24 @@ namespace poc_quadtree
         public QuadTreeRect(Rectangle boundary)
             => this.boundary = boundary;
 
-        public bool Insert(Rectangle rect)
+        public void Insert(Rectangle rect)
         {
             if (!boundary.Intersects(rect))
-                return false;
+                return;
 
             if (objects.Count < MaxNodeCapacity)
             {
                 objects.Add(rect);
-                return true;
+                return;
             }
 
             if (TopLeft == null)
                 Subdivide();
-
-            if (TopLeft.Insert(rect)) return true;
-            if (TopRight.Insert(rect)) return true;
-            if (BottomLeft.Insert(rect)) return true;
-            if (BottomRight.Insert(rect)) return true;
-
-            return false;
+            
+            TopLeft.Insert(rect);
+            TopRight.Insert(rect);
+            BottomLeft.Insert(rect);
+            BottomRight.Insert(rect);
         }
 
         public IEnumerable<Rectangle> Query(Rectangle bounds)
