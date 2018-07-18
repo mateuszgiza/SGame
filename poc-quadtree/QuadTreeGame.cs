@@ -15,7 +15,11 @@ namespace poc_quadtree
         private List<Rectangle> net = new List<Rectangle>();
         private Rectangle? collisionRect;
         private QuadTree points;
+        private QuadTreeRect objects;
         private IEnumerable<Vector2> selectedPoints;
+        private IEnumerable<Rectangle> selectedObjects;
+        private List<Vector2> allPoints = new List<Vector2>();
+        private List<Rectangle> allRects = new List<Rectangle>();
 
         public QuadTreeGame()
         {
@@ -25,16 +29,18 @@ namespace poc_quadtree
 
         protected override void Initialize()
         {
-            var rand = new Random();
+            var rand = new Random(2137_2137);
 
             sprite = new SpriteBatch(GraphicsDevice);
 
             int width = GraphicsDevice.PresentationParameters.BackBufferWidth;
             int height = GraphicsDevice.PresentationParameters.BackBufferHeight;
-            const int QuadSize = 128;
-            const int MaxPoints = 64;
+            const int QuadSize = 32;
+            const int MaxPoints = 2048;
 
-            points = new QuadTree(new Rectangle(0, 0, width, height));
+            var windowBoundaries = new Rectangle(0, 0, width, height);
+            points = new QuadTree(windowBoundaries);
+            objects = new QuadTreeRect(windowBoundaries);
 
             for (int x = 0; x < width; x += QuadSize)
                 for (int y = 0; y < height; y += QuadSize)
@@ -46,6 +52,16 @@ namespace poc_quadtree
                 var y = rand.Next(0, height);
                 var point = new Vector2(x, y);
                 points.Insert(point);
+                allPoints.Add(point);
+            }
+
+            for (int i = 0; i < MaxPoints; ++i)
+            {
+                var x = rand.Next(0, width);
+                var y = rand.Next(0, height);
+                var rect = new Rectangle(x, y, 5, 5);
+                objects.Insert(rect);
+                allRects.Add(rect);
             }
         }
 
@@ -74,9 +90,24 @@ namespace poc_quadtree
                 sprite.DrawRectangle(netItem, color);
             }
 
+            foreach (var p in allPoints)
+            {
+                sprite.DrawPoint(p, Color.DarkBlue, 2);
+            }
+
+            foreach (var r in allRects)
+            {
+                sprite.DrawRectangle(r, Color.DarkBlue, 1);
+            }
+
             foreach (var point in selectedPoints)
             {
-                sprite.DrawPoint(point, Color.GreenYellow, 5);
+                sprite.DrawPoint(point, Color.GreenYellow, 2);
+            }
+
+            foreach (var obj in selectedObjects)
+            {
+                sprite.DrawRectangle(obj, Color.OrangeRed, 1);
             }
 
             sprite.End();
@@ -96,9 +127,15 @@ namespace poc_quadtree
                 }
 
             if (collisionRect.HasValue)
+            {
                 selectedPoints = points.Query(collisionRect.Value);
+                selectedObjects = objects.Query(collisionRect.Value);
+            }
             else
+            {
                 selectedPoints = Enumerable.Empty<Vector2>();
+                selectedObjects = Enumerable.Empty<Rectangle>();
+            }
         }
     }
 
@@ -171,6 +208,78 @@ namespace poc_quadtree
             TopRight = new QuadTree(new Rectangle(x + halfWidth, y, halfWidth, halfHeight));
             BottomLeft = new QuadTree(new Rectangle(x, y + halfHeight, halfWidth, halfHeight));
             BottomRight = new QuadTree(new Rectangle(x + halfWidth, y + halfHeight, halfWidth, halfHeight));
+        }
+    }
+
+    public class QuadTreeRect
+    {
+        private const int MaxNodeCapacity = 4;
+        private int freeIndex = 0;
+        private List<Rectangle> objects = new List<Rectangle>(MaxNodeCapacity);
+        private Rectangle boundary;
+
+        private QuadTreeRect TopLeft, TopRight, BottomLeft, BottomRight;
+
+        public QuadTreeRect(Rectangle boundary)
+            => this.boundary = boundary;
+
+        public bool Insert(Rectangle rect)
+        {
+            if (!boundary.Intersects(rect))
+                return false;
+
+            if (objects.Count < MaxNodeCapacity)
+            {
+                objects.Add(rect);
+                return true;
+            }
+
+            if (TopLeft == null)
+                Subdivide();
+
+            if (TopLeft.Insert(rect)) return true;
+            if (TopRight.Insert(rect)) return true;
+            if (BottomLeft.Insert(rect)) return true;
+            if (BottomRight.Insert(rect)) return true;
+
+            return false;
+        }
+
+        public IEnumerable<Rectangle> Query(Rectangle bounds)
+        {
+            var list = new List<Rectangle>();
+
+            if (!boundary.Intersects(bounds))
+                return list;
+
+            for (int i = 0; i < objects.Count; ++i)
+            {
+                if (bounds.Intersects(objects[i]))
+                    list.Add(objects[i]);
+            }
+
+            if (TopLeft == null)
+                return list;
+
+            list.AddRange(TopLeft.Query(bounds));
+            list.AddRange(TopRight.Query(bounds));
+            list.AddRange(BottomLeft.Query(bounds));
+            list.AddRange(BottomRight.Query(bounds));
+
+            return list;
+        }
+
+        private void Subdivide()
+        {
+            var x = boundary.X;
+            var y = boundary.Y;
+            var halfWidth = boundary.Width / 2;
+            var halfHeight = boundary.Height / 2;
+
+            TopLeft = new QuadTreeRect(new Rectangle(x, y, halfWidth, halfHeight));
+            TopRight = new QuadTreeRect(new Rectangle(x + halfWidth, y, halfWidth, halfHeight));
+            BottomLeft = new QuadTreeRect(new Rectangle(x, y + halfHeight, halfWidth, halfHeight));
+            BottomRight = new QuadTreeRect(new Rectangle(x + halfWidth, y + halfHeight, halfWidth, halfHeight));
         }
     }
 }
